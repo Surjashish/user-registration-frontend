@@ -4,13 +4,15 @@ import { MustMatch } from './must-match.validator';
 import { UserRegistration } from './user-registration.service';
 import { Observable }    from 'rxjs';
 import { PasswordValidation } from './password-validator';
+import {DatePipe} from '@angular/common';
 
 
 
 @Component({
   selector: 'app-user-registration',
   templateUrl: './user-registration.component.html',
-  styleUrls: ['./user-registration.component.css']
+  styleUrls: ['./user-registration.component.css'],
+  providers: [DatePipe]
 })
 export class UserRegistrationComponent implements OnInit {
 
@@ -57,7 +59,7 @@ export class UserRegistrationComponent implements OnInit {
   }
 
   
-  constructor(private formBuilder:FormBuilder,private userRegistration: UserRegistration) { }
+  constructor(private formBuilder:FormBuilder,private userRegistration: UserRegistration,private datePipe: DatePipe) { }
 
   ngOnInit() {
   //   this.registerForm = this.formBuilder.group({
@@ -88,6 +90,7 @@ export class UserRegistrationComponent implements OnInit {
     this.formGroup = this.formBuilder.group({
       'email': [null, [Validators.required, Validators.pattern(emailregex)], this.checkInUseEmail],
       'name': [null, Validators.required],
+      'userName': [null, Validators.required],
       'date': [null, Validators.required],
       'password': [null, [Validators.required, this.checkPassword]],
       'validate': ''
@@ -160,15 +163,17 @@ export class UserRegistrationComponent implements OnInit {
   }
 
   userObject:any;
-  register(name,email,dateOfBirth,password,newsPreferences){
+  register(name,userName,email,dateOfBirth,password,newsPreferences){
 
+    dateOfBirth=this.datePipe.transform(dateOfBirth,"yyyy-MM-dd");
     this.userObject={
       "name":name,
+      "username":userName,
       "email":email,
       "password": password,
       "dateOfBirth": dateOfBirth,
       "newsPreferences": newsPreferences
-    };
+    } ;
     console.log(this.userObject);
 
     this.userRegistration.saveUser(this.userObject)
